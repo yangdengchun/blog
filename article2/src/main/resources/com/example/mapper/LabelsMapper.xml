@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.LabelsMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.entity.Labels">
+        <id column="label_id" jdbcType="INTEGER" property="labelId" />
+        <result column="label_name" jdbcType="VARCHAR" property="labelName" />
+        <result column="label_alias" jdbcType="VARCHAR" property="labelAlias" />
+        <result column="label_description" jdbcType="VARCHAR" property="labelDescription" />
+        <result column="label_date" jdbcType="TIMESTAMP" property="labelDate" />
+    </resultMap>
+
+    <resultMap id="selectArticle" type="com.example.entity.Labels">
+        <id column="label_id" jdbcType="INTEGER" property="labelId" />
+        <result column="label_name" jdbcType="VARCHAR" property="labelName" />
+        <result column="label_alias" jdbcType="VARCHAR" property="labelAlias" />
+        <result column="label_description" jdbcType="VARCHAR" property="labelDescription" />
+        <result column="label_date" jdbcType="TIMESTAMP" property="labelDate" />
+        <collection property="articlesList" javaType="list" ofType="com.example.entity.Articles" select="selectArticleForLabels" column="label_id"></collection>
+    </resultMap>
+
+    <insert id="addLabel" parameterType="com.example.entity.Labels">
+        insert into labels(label_name,label_description,label_date)
+        values(#{label.labelName},#{label.labelDescription},now())
+    </insert>
+
+    <delete id="deleteLabel">
+        delete from labels
+        where label_id = #{id}
+    </delete>
+
+    <update id="updateLabel">
+        update labels
+        set label_name=#{name},label_description=#{description}
+        where label_id=#{id}
+    </update>
+
+    <select id="getLabels" resultMap="BaseResultMap">
+        select *
+        from  labels
+    </select>
+
+    <select id="getTenLabels" resultMap="BaseResultMap">
+        select *
+        from  labels
+        limit 0,10
+    </select>
+
+    <select id="selectArticleForLabels" resultType="com.example.entity.Articles">
+        select *
+        from set_label sl
+            inner join articles a on a.article_id = sl.article_id
+        where sl.label_id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select *
+        from labels
+    </select>
+
+    <select id="selectTen" resultMap="BaseResultMap">
+        select *
+        from labels
+        limit 0,10
+    </select>
+
+    <select id="selectForLabel" resultMap="selectArticle">
+        select *
+        from labels
+        where label_id = #{id}
+    </select>
+
+</mapper>

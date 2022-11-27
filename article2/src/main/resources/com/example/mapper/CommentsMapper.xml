@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.CommentsMapper">
+    <resultMap id="BaseResultMap" type="com.example.entity.Comments">
+        <id column="comment_id" jdbcType="INTEGER" property="commentId" />
+        <result column="user_id" jdbcType="INTEGER" property="userId" />
+        <result column="article_id" jdbcType="INTEGER" property="articleId" />
+        <result column="comment_like_count" jdbcType="INTEGER" property="commentLikeCount" />
+        <result column="comment_content" jdbcType="VARCHAR" property="commentContent" />
+        <result column="comment_date" jdbcType="VARCHAR" property="commentDate" />
+        <result column="parent_comment_id" jdbcType="INTEGER" property="parentCommentId" />
+    </resultMap>
+    <resultMap id="selectUser" type="com.example.entity.Comments">
+        <id column="comment_id" jdbcType="INTEGER" property="commentId" />
+        <result column="user_id" jdbcType="INTEGER" property="userId" />
+        <result column="article_id" jdbcType="INTEGER" property="articleId" />
+        <result column="comment_like_count" jdbcType="INTEGER" property="commentLikeCount" />
+        <result column="comment_content" jdbcType="VARCHAR" property="commentContent" />
+        <result column="comment_date" jdbcType="VARCHAR" property="commentDate" />
+        <result column="parent_comment_id" jdbcType="INTEGER" property="parentCommentId" />
+        <association property="user" javaType="com.example.entity.User">
+            <result property="userNickname" column="user_nickname"/>
+        </association>
+        <association property="articles" javaType="com.example.entity.Articles">
+            <result property="articleTitle" column="article_title"/>
+        </association>
+    </resultMap>
+    <resultMap id="selectComments" type="com.example.entity.Comments">
+        <id column="comment_id" jdbcType="INTEGER" property="commentId" />
+        <result column="user_id" jdbcType="INTEGER" property="userId" />
+        <result column="article_id" jdbcType="INTEGER" property="articleId" />
+        <result column="comment_like_count" jdbcType="INTEGER" property="commentLikeCount" />
+        <result column="comment_content" jdbcType="VARCHAR" property="commentContent" />
+        <result column="comment_date" jdbcType="VARCHAR" property="commentDate" />
+        <result column="parent_comment_id" jdbcType="INTEGER" property="parentCommentId" />
+        <collection property="userList" javaType="list" ofType="com.example.entity.User" select="selectUserForComment" column="user_id"></collection>
+    </resultMap>
+
+    <select id="selectUserForComment" resultType="com.example.entity.User">
+        select *
+        from comments c
+                 INNER JOIN user u on u.user_id = c.user_id
+        where c.user_id = #{user_id}
+    </select>
+
+    <select id="getcomments" resultMap="selectUser">
+        select *
+        from comments c
+                 INNER JOIN user u on u.user_id = c.user_id
+                 INNER JOIN articles a on a.article_id = c.article_id
+    </select>
+
+    <select id="getCommentsForId" resultMap="selectUser">
+        select *
+        from comments c
+                 INNER JOIN user u on u.user_id = c.user_id
+        where article_id = #{id}
+    </select>
+
+    <insert id="addcomments" parameterType="com.example.entity.Comments">
+        insert into comments(user_id,article_id,comment_content,comment_date)
+        values(#{comments1.userId},#{comments1.articleId},#{comments1.commentContent},now())
+    </insert>
+
+    <delete id="delcomments">
+        delete from comments
+        where comment_id = #{id}
+    </delete>
+
+    <select id="getCommentBynickname" resultMap="selectUser">
+        select *
+        from comments c
+                 INNER JOIN user u on u.user_id = c.user_id
+        where u.user_nickname = #{nickname}
+    </select>
+
+</mapper>

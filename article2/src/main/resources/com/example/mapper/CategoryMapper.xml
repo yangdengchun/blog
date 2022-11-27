@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.CategoryMapper">
+    <resultMap id="BaseResultMap" type="com.example.entity.Category">
+        <id column="category_id" jdbcType="INTEGER" property="categoryId" />
+        <result column="category_name" jdbcType="VARCHAR" property="categoryName" />
+        <result column="category_alias" jdbcType="VARCHAR" property="categoryAlias" />
+        <result column="category_description" jdbcType="VARCHAR" property="categoryDescription" />
+        <result column="category_sort_id" jdbcType="VARCHAR" property="categorySortId" />
+        <result column="category_date" jdbcType="TIMESTAMP" property="categoryDate" />
+    </resultMap>
+    <resultMap id="selectArticle" type="com.example.entity.Category">
+        <id column="category_id" jdbcType="INTEGER" property="categoryId" />
+        <result column="category_name" jdbcType="VARCHAR" property="categoryName" />
+        <result column="category_alias" jdbcType="VARCHAR" property="categoryAlias" />
+        <result column="category_description" jdbcType="VARCHAR" property="categoryDescription" />
+        <result column="category_sort_id" jdbcType="VARCHAR" property="categorySortId" />
+        <result column="category_date" jdbcType="TIMESTAMP" property="categoryDate" />
+        <collection property="articlesList" javaType="list" ofType="com.example.entity.Articles" select="selectArticleForCategory" column="category_id"></collection>
+    </resultMap>
+
+    <insert id="saveCategory" parameterType="com.example.entity.Category">
+        insert into category(category_name,category_description,category_date)
+            values(#{category1.categoryName},#{category1.categoryDescription},now())
+    </insert>
+
+    <delete id="deleteCategory">
+        delete from category
+        where category_id = #{id}
+    </delete>
+
+    <update id="updateCategory">
+        update category
+        set category_name=#{name},category_description=#{description}
+        where category_id=#{id}
+    </update>
+
+    <select id="getCategory" resultMap="BaseResultMap">
+        select *
+        from  category
+    </select>
+
+    <select id="selectArticleForCategory" resultType="com.example.entity.Articles">
+        select *
+        from set_category sc
+                 inner join articles a on a.article_id = sc.article_id
+        where sc.category_id = #{category_id}
+    </select>
+
+    <select id="selectForOne" resultMap="selectArticle">
+        select a.*,c.*
+        from articles a
+                 inner join set_category sc on a.article_id = sc.article_id
+                 inner join category c on sc.category_id = c.category_id
+        where a.article_id = #{id}
+    </select>
+
+    <select id="selectForCategory" resultMap="selectArticle">
+        select *
+        from category
+        where category_id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="selectArticle">
+        select *
+        from category
+    </select>
+
+    <select id="selectFour" resultMap="BaseResultMap">
+        select *
+        from category
+        limit 0,4
+    </select>
+</mapper>

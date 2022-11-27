@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.SetCategoryMapper">
+    <resultMap id="BaseResultMap" type="com.example.entity.SetCategory">
+        <id column="article_id" jdbcType="INTEGER" property="articleId" />
+        <id column="category_id" jdbcType="INTEGER" property="categoryId" />
+    </resultMap>
+
+
+    <insert id="setCategoryForArticle" parameterType="com.example.entity.SetCategory">
+        insert into set_category(article_id,category_id)
+        select #{articleId},category_id from category where category_name = #{categoryName}
+    </insert>
+</mapper>

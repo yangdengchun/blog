@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ArticlesMapper">
+    <resultMap id="BaseResultMap" type="com.example.entity.Articles">
+        <id column="article_id" jdbcType="INTEGER" property="articleId" />
+        <result column="user_id" jdbcType="VARCHAR" property="userId" />
+        <result column="article_title" jdbcType="VARCHAR" property="articleTitle" />
+        <result column="article_content" jdbcType="VARCHAR" property="articleContent" />
+        <result column="article_views" jdbcType="VARCHAR" property="articleViews" />
+        <result column="article_comment_count" jdbcType="VARCHAR" property="articleCommentCount" />
+        <result column="article_like_count" jdbcType="VARCHAR" property="articleLikeCount" />
+        <result column="article_date" jdbcType="TIMESTAMP" property="articleDate" />
+        <result column="article_update" jdbcType="TIMESTAMP" property="articleUpdate" />
+    </resultMap>
+    <resultMap id="selectUserForArticle" type="com.example.entity.Articles">
+        <id column="article_id" jdbcType="INTEGER" property="articleId" />
+        <result column="user_id" jdbcType="VARCHAR" property="userId" />
+        <result column="article_title" jdbcType="VARCHAR" property="articleTitle" />
+        <result column="article_content" jdbcType="VARCHAR" property="articleContent" />
+        <result column="article_views" jdbcType="VARCHAR" property="articleViews" />
+        <result column="article_comment_count" jdbcType="VARCHAR" property="articleCommentCount" />
+        <result column="article_like_count" jdbcType="VARCHAR" property="articleLikeCount" />
+        <result column="article_date" jdbcType="TIMESTAMP" property="articleDate" />
+        <result column="article_update" jdbcType="TIMESTAMP" property="articleUpdate" />
+        <association property="user" javaType="com.example.entity.User">
+            <result property="userNickname" column="user_nickname"/>
+        </association>
+    </resultMap>
+    <resultMap id="selectCategory" type="com.example.entity.Articles">
+        <id column="article_id" jdbcType="INTEGER" property="articleId" />
+        <result column="user_id" jdbcType="VARCHAR" property="userId" />
+        <result column="article_title" jdbcType="VARCHAR" property="articleTitle" />
+        <result column="article_content" jdbcType="VARCHAR" property="articleContent" />
+        <result column="article_views" jdbcType="VARCHAR" property="articleViews" />
+        <result column="article_comment_count" jdbcType="VARCHAR" property="articleCommentCount" />
+        <result column="article_like_count" jdbcType="VARCHAR" property="articleLikeCount" />
+        <result column="article_date" jdbcType="TIMESTAMP" property="articleDate" />
+        <result column="article_update" jdbcType="TIMESTAMP" property="articleUpdate" />
+        <collection property="categoryList" javaType="list" ofType="com.example.entity.Category" select="selectCategoryForArticle" column="article_id"></collection>
+    </resultMap>
+    <resultMap id="selectLabel" type="com.example.entity.Labels">
+        <id column="article_id" jdbcType="INTEGER" property="articleId" />
+        <result column="user_id" jdbcType="VARCHAR" property="userId" />
+        <result column="article_title" jdbcType="VARCHAR" property="articleTitle" />
+        <result column="article_content" jdbcType="VARCHAR" property="articleContent" />
+        <result column="article_views" jdbcType="VARCHAR" property="articleViews" />
+        <result column="article_comment_count" jdbcType="VARCHAR" property="articleCommentCount" />
+        <result column="article_like_count" jdbcType="VARCHAR" property="articleLikeCount" />
+        <result column="article_date" jdbcType="TIMESTAMP" property="articleDate" />
+        <result column="article_update" jdbcType="TIMESTAMP" property="articleUpdate" />
+        <collection property="categoryList" javaType="list" ofType="com.example.entity.Category" select="selectCategoryForArticle" column="article_id"></collection>
+    </resultMap>
+    <select id="getArticles" resultMap="selectUserForArticle">
+        select *
+        from articles a
+                 INNER JOIN user u on u.user_id = a.user_id
+    </select>
+
+    <!--增-->
+    <insert id="addArticles" parameterType="com.example.entity.Articles">
+        insert into articles(user_id,article_title,article_content,article_date)
+        values(#{article.userId},#{article.articleTitle},#{article.articleContent},now())
+    </insert>
+    <!--删-->
+    <delete id="delArticles">
+        delete from articles
+        where article_id = #{id}
+    </delete>
+    <!--改-->
+    <update id="updateArticles">
+        update articles
+        set article_title=#{article.articleTitle},article_content=#{article.articleContent}
+        where article_id=#{id}
+    </update>
+
+    <!--根据id查询文章-->
+    <select id="getArticlesById" resultMap="BaseResultMap">
+        select *
+        from  articles
+        where article_id=#{id}
+    </select>
+    <!--根据文章查询所属分类-->
+    <select id="selectCategoryForArticle" resultType="com.example.entity.Category">
+        select c.*
+        from set_category sc
+            inner join category c on c.category_id = sc.category_id
+        where sc.article_id = #{article_id}
+    </select>
+    <!--根据分类id查询一篇文章-->
+    <select id="selectOne" resultMap="selectCategory">
+        select c.*,a.*
+        from category c
+            inner join set_category sc on c.category_id = sc.category_id
+            inner join articles a on sc.article_id = a.article_id
+        where c.category_id = #{id}
+    </select>
+    <!--查询所有-->
+    <select id="selectAll" resultMap="selectCategory">
+        select *
+        from articles
+    </select>
+
+    <select id="selectPage" resultMap="BaseResultMap">
+        select *
+        from articles
+        limit #{pageNum}, #{pageSize};
+    </select>
+
+
+</mapper>
